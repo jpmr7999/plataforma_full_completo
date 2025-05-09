@@ -60,3 +60,23 @@ def vista_venta(request):
 def historial_ventas(request):
     ventas = Venta.objects.order_by('-fecha')
     return render(request, "ventas/historial.html", {"ventas": ventas})
+
+def pagina_pago(request):
+    return render(request, 'ventas/pago.html')
+
+def procesar_pago(request):
+    if request.method == "POST":
+        nombres = request.POST.get("nombres")
+        apellidos = request.POST.get("apellidos")
+
+        # Aquí deberías identificar la venta a la que corresponde este pago
+        # Por ejemplo, si solo hay una venta pendiente:
+        venta = Venta.objects.latest('id')  # O usa una lógica más segura si hay múltiples ventas
+
+        venta.nombre_comprador = nombres
+        venta.apellido_comprador = apellidos
+        venta.save()
+
+        messages.success(request, "Pago realizado con éxito.")
+        return redirect("vista_venta")
+

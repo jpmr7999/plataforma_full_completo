@@ -46,6 +46,9 @@
                     <h5 class="card-title">💰 Resultado de la venta</h5>
                     <p>Total en CLP: <strong>${{ total }}</strong></p>
                     <p>Total en USD: <strong>${{ total_usd }}</strong></p>
+                    <div class="text-center mt-3">
+                        <a href="{% url 'pagina_pago' %}" class="btn btn-success w-100">💳 Ir a pago</a>
+                    </div>
                 </div>
             </div>
             {% endif %}

@@ -16,7 +16,7 @@
             <thead class="table-info">
                 <tr>
                     <th>#</th>
-                    <th>Producto</th>
+                    <th>Nombre Cliente</th>
                     <th>Sucursal</th>
                     <th>Cantidad</th>
                     <th>Total CLP</th>
@@ -30,7 +30,7 @@
                 {% for v in ventas %}
                 <tr>
                     <td>{{ forloop.counter0|add:3 }}</td>
-                    <td>{{ v.nombre_producto }}</td>
+                    <td>{{ v.nombre_comprador }} {{ v.apellido_comprador }}</td>
                     <td>{{ v.sucursal }}</td>
                     <td>{{ v.cantidad }}</td>
                     <td>${{ v.total_clp }}</td>
