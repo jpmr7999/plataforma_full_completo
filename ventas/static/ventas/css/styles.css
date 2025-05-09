@@ -1,1 +1,55 @@
-body { background-color: #f5f5f5; }
+
+body {
+    background-color: #f0faff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 40px;
+    color: #1b2b34;
+}
+
+h1, h2 {
+    color: #0277bd;
+}
+
+.form-label {
+    font-weight: 500;
+}
+
+.alert {
+    border-radius: 8px;
+    font-size: 1.1rem;
+}
+
+.btn {
+    font-weight: 600;
+    padding: 10px 20px;
+    background-color: #00bcd4;
+    border-color: #00acc1;
+}
+
+.btn:hover {
+    background-color: #0097a7;
+    border-color: #00838f;
+}
+
+.list-group-item {
+    font-size: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #e0f7fa;
+    border: 1px solid #b2ebf2;
+}
+
+.list-group-item span {
+    font-weight: bold;
+    color: #007c91;
+}
+
+.card {
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0, 188, 212, 0.2);
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border: 1px solid #00acc1;
+    background-color: #ffffff;
+}
