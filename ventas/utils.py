@@ -1,0 +1,1 @@
+# Funciones para consumir API externa y simular pagos
