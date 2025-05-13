@@ -15,20 +15,37 @@
         {% csrf_token %}
 
         <div class="mb-4">
-            <label class="form-label fw-bold">Selecciona tu banco:</label><br>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="banco" id="banco1" value="Banco Estado" required>
-                <label class="form-check-label" for="banco1">Banco Estado</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="banco" id="banco2" value="Banco Falabella">
-                <label class="form-check-label" for="banco2">Banco Falabella</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="banco" id="banco3" value="Banco de Chile">
-                <label class="form-check-label" for="banco3">Banco de Chile</label>
+            <label class="form-label fw-bold">Selecciona tu banco:</label>
+            <div class="d-flex gap-4 flex-wrap mt-2">
+        
+                <div class="form-check text-center">
+                    <input class="form-check-input d-block mx-auto" type="radio" name="banco" id="banco1" value="Banco Estado" required>
+                    <label class="form-check-label" for="banco1">
+                        <img src="{% static 'icon/estado.png' %}" alt="Banco Estado" style="width: 60px; height: auto; display: block; margin: 0 auto 4px;">
+                        Banco Estado
+                    </label>
+                </div>
+        
+                <div class="form-check text-center">
+                    <input class="form-check-input d-block mx-auto" type="radio" name="banco" id="banco2" value="Banco Falabella">
+                    <label class="form-check-label" for="banco2">
+                        <img src="{% static 'icon/falabella.png' %}" alt="Banco Falabella" style="width: 60px; height: auto; display: block; margin: 0 auto 4px;">
+                        Banco Falabella
+                    </label>
+                </div>
+        
+                <div class="form-check text-center">
+                    <input class="form-check-input d-block mx-auto" type="radio" name="banco" id="banco3" value="Banco de Chile">
+                    <label class="form-check-label" for="banco3">
+                        <img src="{% static 'icon/bancochile.jpg' %}" alt="Banco de Chile" style="width: 60px; height: auto; display: block; margin: 0 auto 4px;">
+                        Banco de Chile
+                    </label>
+                </div>
+        
             </div>
         </div>
+        
+        
 
         <hr>
 
@@ -49,8 +66,9 @@
 
         <div class="mb-3">
             <label for="numero" class="form-label">Número</label>
-            <input type="text" class="form-control" id="numero" name="numero" required>
+            <input type="number" class="form-control" id="numero" name="numero" required>
         </div>
+        
 
         <div class="text-center mt-4">
             <button type="submit" class="btn btn-success">✅ Confirmar Pago</button>
