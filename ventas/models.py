@@ -12,7 +12,7 @@ class Venta(models.Model):
     cantidad = models.PositiveIntegerField()
     total_clp = models.DecimalField(max_digits=12, decimal_places=2)
     total_usd = models.DecimalField(max_digits=12, decimal_places=2)
-    fecha = models.DateTimeField(default=timezone.now)
+    fecha = models.CharField(max_length=10,default=timezone.now)
 
     
     nombre_comprador = models.CharField(max_length=100, blank=True, null=True)
