@@ -51,19 +51,22 @@
 
         <div class="mb-3">
             <label for="nombres" class="form-label">Nombres</label>
-            <input type="text" class="form-control" id="nombres" name="nombres" required>
+            <input type="text" class="form-control" id="nombres" name="nombres" required 
+                   oninput="this.value = this.value.replace(/[0-9]/g, '')">
         </div>
-
+        
         <div class="mb-3">
             <label for="apellidos" class="form-label">Apellidos</label>
-            <input type="text" class="form-control" id="apellidos" name="apellidos" required>
+            <input type="text" class="form-control" id="apellidos" name="apellidos" required 
+                   oninput="this.value = this.value.replace(/[0-9]/g, '')">
         </div>
-
+        
         <div class="mb-3">
             <label for="direccion" class="form-label">Dirección</label>
-            <input type="text" class="form-control" id="direccion" name="direccion" required>
+            <input type="text" class="form-control" id="direccion" name="direccion" required 
+                   oninput="this.value = this.value.replace(/[0-9]/g, '')">
         </div>
-
+        
         <div class="mb-3">
             <label for="numero" class="form-label">Número</label>
             <input type="number" class="form-control" id="numero" name="numero" required>
