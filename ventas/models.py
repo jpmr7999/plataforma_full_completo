@@ -18,7 +18,6 @@ class Venta(models.Model):
     nombre_comprador = models.CharField(max_length=100, blank=True, null=True)
 
 class Sucursal(models.Model):
-    id_sucursal = models.PositiveIntegerField(max_length=50)
-    nombre_sucursal = models.PositiveBigIntegerField(max_length=100)
+    nombre_sucursal = models.CharField(max_length=100)
     unidades = models.PositiveIntegerField()
-    precio = models.DecimalField(max_digits=12,decimal_places=2)
+    precio = models.DecimalField(max_digits=12, decimal_places=2)
