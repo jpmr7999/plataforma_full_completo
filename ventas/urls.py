@@ -12,5 +12,9 @@ urlpatterns = [
     path('webpay/return/', views.webpay_return, name='webpay_return'),
     path('inventario/', views.inventario, name='inventario'),
     path('actualizar-stock/', views.actualizar_stock, name='actualizar_stock'),
+    path('crear-producto/', views.crear_producto, name='crear_producto'),
+    path('eliminar-producto/<int:producto_id>/', views.eliminar_producto, name='eliminar_producto'),
+    path('sse/stock-bajo/', views.sse_stock_bajo, name='sse_stock_bajo'),
     path('api/', include(router.urls)),
+    path('api/convertir-moneda/', views.convertir_moneda, name='convertir_moneda'),
 ]

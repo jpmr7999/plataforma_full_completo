@@ -5,18 +5,27 @@ class ProductoCasaMatriz(models.Model):
     nombre = models.CharField(max_length=100)
     cantidad = models.PositiveIntegerField()
     precio = models.DecimalField(max_digits=10, decimal_places=2)
+    imagen = models.ImageField(upload_to='productos/', blank=True, null=True, help_text="Imagen del producto")
+
+    def __str__(self):
+        return self.nombre
 
 class Sucursal(models.Model):
     nombre = models.CharField(max_length=100)
     cantidad = models.PositiveIntegerField()
     precio = models.DecimalField(max_digits=10, decimal_places=2)
+    imagen = models.ImageField(upload_to='productos/', blank=True, null=True, help_text="Imagen del producto")
+
+    def __str__(self):
+        return self.nombre
 
     def to_dict(self):
         return {
             "id": self.id,
             "nombre": self.nombre,
             "cantidad": self.cantidad,
-            "precio": float(self.precio)
+            "precio": float(self.precio),
+            "imagen": self.imagen.url if self.imagen else None
         }
 
 class Venta(models.Model):

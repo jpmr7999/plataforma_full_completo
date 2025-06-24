@@ -52,6 +52,13 @@
 <div class="container py-5">
     <h1 class="text-center mb-4">📊 Inventario</h1>
 
+    <!-- Botón para crear productos -->
+    <div class="text-center mb-4">
+        <a href="{% url 'crear_producto' %}" class="btn btn-success btn-lg">
+            ➕ Crear Nuevo Producto
+        </a>
+    </div>
+
     <!-- Mensajes de alerta -->
     <div id="alertContainer" class="mb-4" style="display: none;">
         <div class="alert alert-dismissible fade show" role="alert">
@@ -96,6 +103,7 @@
                 <table class="table table-hover">
                     <thead class="table-light">
                         <tr>
+                            <th>Imagen</th>
                             <th>Producto</th>
                             <th>Sucursal</th>
                             <th class="text-end {% if 'stock' in orden_actual %}order-{{ orden_actual|slice:'6:' }}{% endif %}">
@@ -112,6 +120,16 @@
                     <tbody>
                         {% for producto in productos %}
                         <tr id="row-{{ forloop.counter }}">
+                            <td>
+                                {% if producto.imagen %}
+                                    <img src="{{ producto.imagen }}" alt="{{ producto.nombre }}" 
+                                         style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">
+                                {% else %}
+                                    <div style="width: 50px; height: 50px; background-color: #f8f9fa; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                                        📦
+                                    </div>
+                                {% endif %}
+                            </td>
                             <td>{{ producto.nombre }}</td>
                             <td>{{ producto.sucursal }}</td>
                             <td class="text-end">
@@ -133,11 +151,15 @@
                                         onclick="cancelEdit(this)">
                                     ❌ Cancelar
                                 </button>
+                                <button class="btn btn-sm btn-outline-danger ms-1"
+                                        onclick="confirmarEliminar({{ producto.id }}, '{{ producto.nombre }}')">
+                                    🗑️ Eliminar
+                                </button>
                             </td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="5" class="text-center text-muted">No hay productos disponibles</td>
+                            <td colspan="6" class="text-center text-muted">No hay productos disponibles</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -148,6 +170,26 @@
 
     <div class="text-center mt-4">
         <a href="/" class="btn btn-outline-primary">⬅ Volver a Ventas</a>
+    </div>
+</div>
+
+<!-- Modal de confirmación para eliminar -->
+<div class="modal fade" id="eliminarModal" tabindex="-1" aria-labelledby="eliminarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="eliminarModalLabel">🗑️ Confirmar Eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que quieres eliminar el producto <strong id="nombreProductoEliminar"></strong>?</p>
+                <p class="text-danger"><small>⚠️ Esta acción no se puede deshacer.</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">❌ Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmarEliminarBtn">🗑️ Eliminar</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -241,8 +283,38 @@
             }
         })
         .catch(error => {
+            console.error('Error:', error);
             showAlert('Error al actualizar el stock', 'danger');
         });
+    }
+
+    function confirmarEliminar(productoId, nombreProducto) {
+        // Mostrar el modal de confirmación
+        const modal = new bootstrap.Modal(document.getElementById('eliminarModal'));
+        document.getElementById('nombreProductoEliminar').textContent = nombreProducto;
+        
+        // Configurar el botón de confirmar
+        const confirmarBtn = document.getElementById('confirmarEliminarBtn');
+        confirmarBtn.onclick = function() {
+            // Crear un formulario temporal para enviar la solicitud POST
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/eliminar-producto/${productoId}/`;
+            
+            // Agregar el token CSRF
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = 'csrfmiddlewaretoken';
+            csrfToken.value = document.cookie.split('; ')
+                .find(row => row.startsWith('csrftoken='))
+                ?.split('=')[1];
+            
+            form.appendChild(csrfToken);
+            document.body.appendChild(form);
+            form.submit();
+        };
+        
+        modal.show();
     }
 </script>
 </body>

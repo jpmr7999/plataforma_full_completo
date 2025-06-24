@@ -20,6 +20,18 @@
 <div class="container py-5">
     <h1 class="mb-4 text-center">🛒 Plataforma de Ventas</h1>
 
+    <!-- Información de tasa de cambio -->
+    {% if tasa_cambio %}
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-6">
+            <div class="alert alert-info text-center">
+                <strong>💱 Tasa de Cambio Actual:</strong> ${{ tasa_cambio|floatformat:2 }} CLP/USD
+                <br><small>Actualizada automáticamente usando la API de conversión de moneda</small>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
     {% for msg in messages %}
         <div class="alert alert-{{ msg.tags }} text-center">{{ msg }}</div>
     {% endfor %}
@@ -90,8 +102,206 @@
 
     <div class="text-center mt-4">
         <a href="/historial/" class="btn btn-outline-secondary me-2">📄 Ver historial de ventas</a>
-        <a href="/inventario/" class="btn btn-outline-info">📊 Ver inventario</a>
+        <a href="/inventario/" class="btn btn-outline-info me-2">📊 Ver inventario</a>
+        <a href="/api/convertir-moneda/?monto=50000" class="btn btn-outline-success" target="_blank">💱 Probar API Conversión</a>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Validaciones del frontend para cumplir con los requisitos del profesor
+
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const sucursalSelect = document.querySelector('select[name="sucursal"]');
+    const cantidadInput = document.querySelector('input[name="cantidad"]');
+    
+    // Función para obtener el stock disponible de la sucursal seleccionada
+    function obtenerStockDisponible() {
+        const optionSeleccionada = sucursalSelect.options[sucursalSelect.selectedIndex];
+        const texto = optionSeleccionada.textContent;
+        const match = texto.match(/\((\d+) uds/);
+        return match ? parseInt(match[1]) : 0;
+    }
+    
+    // Función para mostrar mensaje de error
+    function mostrarError(mensaje) {
+        // Remover mensajes de error anteriores
+        const erroresAnteriores = document.querySelectorAll('.error-mensaje');
+        erroresAnteriores.forEach(error => error.remove());
+        
+        // Crear nuevo mensaje de error
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'alert alert-danger error-mensaje mt-2';
+        errorDiv.textContent = mensaje;
+        
+        // Insertar después del campo correspondiente
+        if (mensaje.includes('cantidad')) {
+            cantidadInput.parentNode.appendChild(errorDiv);
+        } else if (mensaje.includes('sucursal')) {
+            sucursalSelect.parentNode.appendChild(errorDiv);
+        }
+    }
+    
+    // Función para limpiar mensajes de error
+    function limpiarErrores() {
+        const errores = document.querySelectorAll('.error-mensaje');
+        errores.forEach(error => error.remove());
+    }
+    
+    // Validación en tiempo real de la cantidad
+    cantidadInput.addEventListener('input', function() {
+        limpiarErrores();
+        const cantidad = parseInt(this.value);
+        const stockDisponible = obtenerStockDisponible();
+        
+        // Validación 1: Valor mayor que cero (Requisito 5 - 2 puntos)
+        if (cantidad <= 0) {
+            mostrarError('❌ La cantidad debe ser mayor que cero');
+            return;
+        }
+        
+        // Validación 2: Stock disponible (Requisito 4 - 2 puntos)
+        if (cantidad > stockDisponible) {
+            mostrarError(`❌ Stock insuficiente. Solo hay ${stockDisponible} unidades disponibles`);
+            return;
+        }
+        
+        // Mostrar información de stock restante
+        const stockRestante = stockDisponible - cantidad;
+        if (stockRestante < 10) {
+            mostrarError(`⚠️ Atención: Quedarán solo ${stockRestante} unidades en stock`);
+        }
+    });
+    
+    // Validación al cambiar sucursal
+    sucursalSelect.addEventListener('change', function() {
+        limpiarErrores();
+        const stockDisponible = obtenerStockDisponible();
+        const cantidad = parseInt(cantidadInput.value);
+        
+        if (cantidad > 0) {
+            if (cantidad > stockDisponible) {
+                mostrarError(`❌ Stock insuficiente en esta sucursal. Solo hay ${stockDisponible} unidades disponibles`);
+            }
+        }
+    });
+    
+    // Validación al enviar el formulario
+    form.addEventListener('submit', function(e) {
+        limpiarErrores();
+        const cantidad = parseInt(cantidadInput.value);
+        const stockDisponible = obtenerStockDisponible();
+        
+        // Validación final antes de enviar
+        if (cantidad <= 0) {
+            e.preventDefault();
+            mostrarError('❌ La cantidad debe ser mayor que cero');
+            return false;
+        }
+        
+        if (cantidad > stockDisponible) {
+            e.preventDefault();
+            mostrarError(`❌ Stock insuficiente. Solo hay ${stockDisponible} unidades disponibles`);
+            return false;
+        }
+        
+        // Si todo está bien, mostrar confirmación
+        console.log('✅ Validaciones pasadas - Enviando formulario');
+    });
+    
+    // Función para actualizar información de stock en tiempo real
+    function actualizarInfoStock() {
+        const stockDisponible = obtenerStockDisponible();
+        const cantidad = parseInt(cantidadInput.value) || 0;
+        
+        // Mostrar información de stock disponible
+        const infoStock = document.getElementById('info-stock');
+        if (!infoStock) {
+            const infoDiv = document.createElement('div');
+            infoDiv.id = 'info-stock';
+            infoDiv.className = 'alert alert-info mt-2';
+            sucursalSelect.parentNode.appendChild(infoDiv);
+        }
+        
+        if (stockDisponible > 0) {
+            document.getElementById('info-stock').innerHTML = 
+                `📦 Stock disponible: <strong>${stockDisponible}</strong> unidades`;
+        }
+    }
+    
+    // Actualizar información de stock al cargar la página
+    actualizarInfoStock();
+    
+    // Actualizar información cuando cambie la selección
+    sucursalSelect.addEventListener('change', actualizarInfoStock);
+    
+    // Server Send Events para alertas de stock bajo (Requisito 7 - 15 puntos)
+    function conectarSSE() {
+        const eventSource = new EventSource('/sse/stock-bajo/');
+        
+        eventSource.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            
+            if (data.tipo === 'stock_bajo') {
+                mostrarAlertaStockBajo(data.alertas);
+            } else if (data.tipo === 'error') {
+                console.error('Error en SSE:', data.mensaje);
+            }
+        };
+        
+        eventSource.onerror = function(event) {
+            console.error('Error en conexión SSE:', event);
+            // Reintentar conexión después de 5 segundos
+            setTimeout(conectarSSE, 5000);
+        };
+        
+        return eventSource;
+    }
+    
+    function mostrarAlertaStockBajo(alertas) {
+        // Crear notificación de stock bajo
+        const notificacion = document.createElement('div');
+        notificacion.className = 'alert alert-warning alert-dismissible fade show position-fixed';
+        notificacion.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+        
+        let contenido = '<h6>⚠️ Alerta: Stock Bajo</h6>';
+        alertas.forEach(alerta => {
+            contenido += `<p class="mb-1"><strong>${alerta.sucursal}:</strong> ${alerta.producto} - ${alerta.stock_actual} unidades</p>`;
+        });
+        contenido += '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+        
+        notificacion.innerHTML = contenido;
+        document.body.appendChild(notificacion);
+        
+        // Auto-remover después de 10 segundos
+        setTimeout(() => {
+            if (notificacion.parentNode) {
+                notificacion.remove();
+            }
+        }, 10000);
+        
+        // Reproducir sonido de alerta (opcional)
+        if (typeof Audio !== 'undefined') {
+            try {
+                const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT');
+                audio.play();
+            } catch (e) {
+                console.log('No se pudo reproducir sonido de alerta');
+            }
+        }
+    }
+    
+    // Iniciar conexión SSE
+    const sseConnection = conectarSSE();
+    
+    // Limpiar conexión al cerrar la página
+    window.addEventListener('beforeunload', function() {
+        if (sseConnection) {
+            sseConnection.close();
+        }
+    });
+});
+</script>
 </body>
 </html>

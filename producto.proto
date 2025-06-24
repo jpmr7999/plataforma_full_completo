@@ -1,0 +1,156 @@
+syntax = "proto3";
+
+package producto;
+
+// Servicio para gestionar productos
+service ProductoService {
+  // Listar todos los productos
+  rpc ListarProductos (ListarProductosRequest) returns (ListarProductosResponse);
+  
+  // Crear un nuevo producto
+  rpc CrearProducto (CrearProductoRequest) returns (CrearProductoResponse);
+  
+  // Obtener un producto por ID
+  rpc ObtenerProducto (ObtenerProductoRequest) returns (ObtenerProductoResponse);
+  
+  // Actualizar un producto
+  rpc ActualizarProducto (ActualizarProductoRequest) returns (ActualizarProductoResponse);
+  
+  // Eliminar un producto
+  rpc EliminarProducto (EliminarProductoRequest) returns (EliminarProductoResponse);
+  
+  // Buscar productos por nombre
+  rpc BuscarProductos (BuscarProductosRequest) returns (BuscarProductosResponse);
+  
+  // Obtener productos por sucursal
+  rpc ProductosPorSucursal (ProductosPorSucursalRequest) returns (ProductosPorSucursalResponse);
+  
+  // Actualizar stock de un producto
+  rpc ActualizarStock (ActualizarStockRequest) returns (ActualizarStockResponse);
+}
+
+// Mensaje que representa un producto
+message Producto {
+  int32 id = 1;
+  string nombre = 2;
+  int32 cantidad = 3;
+  double precio = 4;
+  string sucursal = 5;
+  string fecha_creacion = 6;
+  bool activo = 7;
+}
+
+// Mensaje para listar productos
+message ListarProductosRequest {
+  int32 pagina = 1;
+  int32 elementos_por_pagina = 2;
+  string ordenar_por = 3;  // "nombre", "precio", "cantidad"
+  string orden = 4;        // "asc", "desc"
+}
+
+message ListarProductosResponse {
+  repeated Producto productos = 1;
+  int32 total_productos = 2;
+  int32 pagina_actual = 3;
+  int32 total_paginas = 4;
+  string mensaje = 5;
+  bool exito = 6;
+}
+
+// Mensaje para crear producto
+message CrearProductoRequest {
+  string nombre = 1;
+  int32 cantidad = 2;
+  double precio = 3;
+  string tipo_sucursal = 4;  // "casa_matriz" o "sucursal"
+  string nombre_sucursal = 5; // Solo si tipo_sucursal es "sucursal"
+}
+
+message CrearProductoResponse {
+  Producto producto = 1;
+  string mensaje = 2;
+  bool exito = 3;
+}
+
+// Mensaje para obtener producto por ID
+message ObtenerProductoRequest {
+  int32 id = 1;
+}
+
+message ObtenerProductoResponse {
+  Producto producto = 1;
+  string mensaje = 2;
+  bool exito = 3;
+}
+
+// Mensaje para actualizar producto
+message ActualizarProductoRequest {
+  int32 id = 1;
+  string nombre = 2;
+  int32 cantidad = 3;
+  double precio = 4;
+  string sucursal = 5;
+}
+
+message ActualizarProductoResponse {
+  Producto producto = 1;
+  string mensaje = 2;
+  bool exito = 3;
+}
+
+// Mensaje para eliminar producto
+message EliminarProductoRequest {
+  int32 id = 1;
+}
+
+message EliminarProductoResponse {
+  string mensaje = 2;
+  bool exito = 3;
+}
+
+// Mensaje para buscar productos
+message BuscarProductosRequest {
+  string termino_busqueda = 1;
+  int32 pagina = 2;
+  int32 elementos_por_pagina = 3;
+}
+
+message BuscarProductosResponse {
+  repeated Producto productos = 1;
+  int32 total_encontrados = 2;
+  string mensaje = 3;
+  bool exito = 4;
+}
+
+// Mensaje para productos por sucursal
+message ProductosPorSucursalRequest {
+  string sucursal = 1;
+  int32 pagina = 2;
+  int32 elementos_por_pagina = 3;
+}
+
+message ProductosPorSucursalResponse {
+  repeated Producto productos = 1;
+  int32 total_productos = 2;
+  string mensaje = 3;
+  bool exito = 4;
+}
+
+// Mensaje para actualizar stock
+message ActualizarStockRequest {
+  int32 id = 1;
+  int32 nueva_cantidad = 2;
+}
+
+message ActualizarStockResponse {
+  Producto producto = 1;
+  string mensaje = 2;
+  bool exito = 3;
+}
+
+// Mensajes de error
+message ErrorResponse {
+  string codigo_error = 1;
+  string mensaje_error = 2;
+  string detalles = 3;
+} 
